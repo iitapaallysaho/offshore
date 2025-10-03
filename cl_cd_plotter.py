@@ -162,6 +162,29 @@ def sort_zone_series(zone_data: Dict[str, List[float]]) -> Tuple[List[float], Li
 	return list(aoa), list(cl), list(cd)
 
 
+def find_optimal_aoa(zone_data: Dict[str, List[float]]) -> Tuple[float, float, float, float]:
+	"""Return AoA, Cl, Cd, and Cl/Cd for the best lift-to-drag ratio."""
+
+	aoa, cl, cd = sort_zone_series(zone_data)
+	if not aoa:
+		raise ValueError("Zone data is empty; cannot determine optimal angle of attack.")
+
+	best_index = 0
+	best_ratio = float("-inf")
+
+	for idx, (cl_value, cd_value) in enumerate(zip(cl, cd)):
+		if abs(cd_value) < 1e-12:
+			ratio = float("inf")
+		else:
+			ratio = cl_value / cd_value
+
+		if ratio > best_ratio:
+			best_index = idx
+			best_ratio = ratio
+
+	return aoa[best_index], cl[best_index], cd[best_index], best_ratio
+
+
 def plot_cl_cd(
 	data: Dict[str, Dict[str, List[float]]],
 	*,
@@ -277,6 +300,15 @@ def main() -> None:
 
 	args = parse_args()
 	data = load_cl_cd_data(args.data)
+
+	print("Optimal angle of attack by Reynolds number (max Cl/Cd):")
+	for reynolds, zone in data.items():
+		aoa_opt, cl_opt, cd_opt, ratio_opt = find_optimal_aoa(zone)
+		ratio_str = "∞" if ratio_opt == float("inf") else f"{ratio_opt:.2f}"
+		print(
+			f"  {reynolds:>20}: AoA = {aoa_opt:6.2f}°, Cl = {cl_opt:6.3f}, "
+			f"Cd = {cd_opt:7.4f}, Cl/Cd = {ratio_str}"
+		)
 	plot_cl_cd(data, output=args.output, show=not args.no_show, dpi=args.dpi)
 
 

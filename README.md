@@ -9,10 +9,12 @@ the DU91-W2-250 airfoil based on JavaFoil output (`ClCdDU91-W2-250.dat`).
 python joo.py --data ClCdDU91-W2-250.dat --output plots/cl_cd_vs_aoa.png
 ```
 
-The command reads the provided `.dat` file, creates a single plot with dual
-y-axes—$C_\ell$ on the left and $C_d$ on the right—plotted against angle of
-attack for each Reynolds number block, saves the figure, and opens an interactive
-window. To suppress the window (for headless environments), add `--no-show`.
+The command reads the provided `.dat` file, prints the optimal angle of attack
+for each Reynolds number (based on maximising $C_\ell/C_d$), creates a single
+plot with dual y-axes—$C_\ell$ on the left and $C_d$ on the right—plotted
+against angle of attack for each Reynolds number block, saves the figure, and
+opens an interactive window. To suppress the window (for headless
+environments), add `--no-show`.
 
 ## Command-line options
 
